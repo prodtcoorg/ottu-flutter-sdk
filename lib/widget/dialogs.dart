@@ -1,16 +1,17 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:ottu/consts/consts.dart';
 import 'package:ottu/consts/imagePath.dart';
 import 'package:ottu/generated/l10n.dart';
+
 import '../consts/colors.dart';
 
 ///all dialogs that used in ottu sdk.
 class Dialogs {
   Dialogs();
-  Future showDialogs(
-      BuildContext context, Future Function() function, String cardName) async {
+  Future showDialogs(BuildContext context, Future Function() function, String cardName) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) => MaterialApp(
@@ -177,8 +178,7 @@ class Dialogs {
                       Text(
                         amount.toString() + currencyCode + ' ' + S().ispaid,
                         textAlign: TextAlign.center,
-                        style:
-                            const TextStyle(fontSize: 17, color: primaryColor),
+                        style: const TextStyle(fontSize: 17, color: primaryColor),
                       ),
                       const Divider(),
                       SizedBox(
@@ -188,10 +188,7 @@ class Dialogs {
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.of(context).pop();
-                                  Navigator.popUntil(
-                                      context,
-                                      (Route<dynamic> predicate) =>
-                                          predicate.isFirst);
+                                  Navigator.popUntil(context, (Route<dynamic> predicate) => predicate.isFirst);
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.only(
@@ -243,7 +240,7 @@ class Dialogs {
               Navigator.of(ctx).pop();
             },
             style: TextButton.styleFrom(
-              primary: primaryColor,
+              backgroundColor: primaryColor,
               side: const BorderSide(color: primaryColor),
             ),
             child: Text(
@@ -312,8 +309,7 @@ class Dialogs {
                                   Navigator.of(context).pop();
                                   Navigator.popUntil(
                                     context,
-                                    (Route<dynamic> predicate) =>
-                                        predicate.isFirst,
+                                    (Route<dynamic> predicate) => predicate.isFirst,
                                   );
                                 },
                                 child: Container(
