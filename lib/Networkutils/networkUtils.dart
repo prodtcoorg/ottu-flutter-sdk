@@ -6,7 +6,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_windowmanager/flutter_windowmanager.dart';
+// import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:ottu/applePay/applePay.dart';
@@ -19,7 +19,7 @@ import 'package:ottu/screen/mobile_popup_screen.dart';
 import 'package:ottu/screen/paymentScreen.dart';
 import 'package:ottu/screen/webView/webViewScreen.dart';
 import 'package:ottu/security/jailBreakDetection.dart';
-import 'package:ottu/widget/Toastt.dart';
+import 'package:ottu/widget/Toast.dart';
 
 import '../security/Encryption.dart';
 
@@ -81,7 +81,7 @@ class NetworkUtils {
 
       if (statusCode == 200) {
         if (!Platform.isIOS) {
-          await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+          // await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
         }
 
         payment = Payment.fromJson(res);
