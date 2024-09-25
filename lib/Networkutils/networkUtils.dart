@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
@@ -14,11 +15,11 @@ import 'package:ottu/models/3DSResponse.dart';
 import 'package:ottu/models/fetchpaymenttransaction.dart';
 import 'package:ottu/paymentDelegate/paymentDelegate.dart';
 import 'package:ottu/screen/3DS/WebViewWithSocketScreen.dart';
+import 'package:ottu/screen/mobile_popup_screen.dart';
 import 'package:ottu/screen/paymentScreen.dart';
 import 'package:ottu/screen/webView/webViewScreen.dart';
 import 'package:ottu/security/jailBreakDetection.dart';
-import 'package:ottu/widget/Toast.dart';
-import 'package:ottu/screen/mobile_popup_screen.dart';
+import 'package:ottu/widget/Toastt.dart';
 
 import '../security/Encryption.dart';
 
@@ -95,9 +96,9 @@ class NetworkUtils {
               ),
             ),
           );
-        } else if(methodType == METHOD_TYPE_STC) {
+        } else if (methodType == METHOD_TYPE_STC) {
           PaymentMethod? stcPaymentMethod = payment.paymentMethods?.firstWhere((element) => element.flow == "stc_pay");
-          if(stcPaymentMethod != null) showMobileOTPPopup(context, stcPaymentMethod, isDirect: true);
+          if (stcPaymentMethod != null) showMobileOTPPopup(context, stcPaymentMethod, isDirect: true);
         } else {
           openScreen();
         }
@@ -174,7 +175,14 @@ class NetworkUtils {
         "payment_method": "card",
         "secret_id": secretid,
         "card": EncrypData().encrypt(
-          json.encode({"name_on_card": nameoncard, "number": cardnumber, "expiry_year": expiryYear, "expiry_month": expiryMonth, "cvv": cvv, "save_card": savecard}),
+          json.encode({
+            "name_on_card": nameoncard,
+            "number": cardnumber,
+            "expiry_year": expiryYear,
+            "expiry_month": expiryMonth,
+            "cvv": cvv,
+            "save_card": savecard
+          }),
           publicKey,
         ),
       };
@@ -285,7 +293,11 @@ class NetworkUtils {
         'Authorization': 'Api-Key $token',
         'Content-Type': 'application/json',
       },
-      body: json.encode({"apple_url": "https://apple-pay-gateway.apple.com/paymentservices/paymentSession", "session_id": sessionId, "code": "apple-pay"}),
+      body: json.encode({
+        "apple_url": "https://apple-pay-gateway.apple.com/paymentservices/paymentSession",
+        "session_id": sessionId,
+        "code": "apple-pay"
+      }),
     )
         .then((value) async {
       var responeStatuscode = value.statusCode;
@@ -297,7 +309,8 @@ class NetworkUtils {
     });
   }
 
-  static Future applePayPaymentUrl(String url, BuildContext context, String currencyCode, String amount, dynamic paymentData, String merchantId) async {
+  static Future applePayPaymentUrl(String url, BuildContext context, String currencyCode, String amount,
+      dynamic paymentData, String merchantId) async {
     final applePayPayload = _buildApplePayPayload(paymentData, merchantId);
     await _postPaymentRequest(url, applePayPayload).then((response) async {
       var callbackPayload = json.decode(response.body);
@@ -305,21 +318,20 @@ class NetworkUtils {
         final redirectUrl = callbackPayload["callback_payload"];
         if (response.statusCode == 200) {
           status = status;
-            paymentDelegates!.successCallback(jsonEncode(redirectUrl));
-            Navigator.of(context).pop();
-        }else if (response.statusCode == 400){  
+          paymentDelegates!.successCallback(jsonEncode(redirectUrl));
+          Navigator.of(context).pop();
+        } else if (response.statusCode == 400) {
           paymentDelegates!.errorCallback(jsonEncode(redirectUrl));
           Navigator.of(context).pop();
-        }else{
-            paymentDelegates!.errorCallback(jsonEncode(redirectUrl));
-            Navigator.of(context).pop();
+        } else {
+          paymentDelegates!.errorCallback(jsonEncode(redirectUrl));
+          Navigator.of(context).pop();
         }
-      }else{
+      } else {
         paymentDelegates!.errorCallback(jsonEncode(callbackPayload));
-            Navigator.of(context).pop();
+        Navigator.of(context).pop();
       }
     });
-    
   }
 
   static Map<String, dynamic> _buildApplePayPayload(dynamic paymentData, String merchantId) {
