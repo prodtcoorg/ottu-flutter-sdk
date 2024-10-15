@@ -1,23 +1,25 @@
 // ignore_for_file: file_names
 
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import "package:flutter_screenutil/flutter_screenutil.dart";
 import 'package:ottu/Networkutils/networkUtils.dart';
 import 'package:ottu/consts/colors.dart';
 import 'package:ottu/consts/consts.dart';
 import 'package:ottu/models/fetchpaymenttransaction.dart' as c;
 import 'package:ottu/screen/mobile_popup_screen.dart';
+import 'package:ottu/screen/webView/webViewScreen.dart';
 import 'package:ottu/widget/shimmer.dart';
+
 import '../applePay/applePay.dart';
 import '../cardValidators/payment_card.dart';
-import "package:flutter_screenutil/flutter_screenutil.dart";
 import '../consts/imagePath.dart';
 import '../functions/pay.dart';
 import '../generated/l10n.dart';
 import '../widget/cardTile.dart';
 import '../widget/dialogs.dart';
 import '../widget/savedCard.dart';
-import 'package:ottu/screen/webView/webViewScreen.dart';
 
 final paymentCard = PaymentCard();
 
@@ -59,7 +61,6 @@ class PaymentDetailsScreenState extends State<PaymentDetailsScreen> {
   int savedcvvindex = 0;
   String fee_description = '';
   c.Payment payment = c.Payment();
-
 
   //handeling card image
   void _getCardTypeFrmNumber() {
@@ -159,60 +160,84 @@ class PaymentDetailsScreenState extends State<PaymentDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: canvasColor,
-        body: ScreenUtilInit(
-          builder: (context, child) {
-            return ListView(
-              children: [
-                Form(
-                  key: formKey,
-                  child: IgnorePointer(
-                    ignoring: ignoreTouch,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 10),
-                        if (isEnable) buildShimmer(100.0),
-                        const SizedBox(height: 20),
-                        if (!isEnable) buildTotalAmountContainer(context),
-                        const SizedBox(height: 10),
-                        if (isEnable) buildShimmer(200.0),
-                        if (!isEnable) buildPaymentMethodsContainer(context),
-                        const SizedBox(height: 10),
-                        if (isEnable) buildShimmer(50.0),
-                        if (!isEnable) buildPayNowButtonContainer(context),
-                        const SizedBox(height: 10),
-                        if (fees.isNotEmpty && double.parse(fees) > 0)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: "+$fees $feesCurrencyCode ",
-                                      style: const TextStyle(color: primaryColor),
-                                    ),
-                                    TextSpan(
-                                      text: fee_description,
-                                      style: const TextStyle(color: blackColor),
-                                    ),
-                                  ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (b, d) async {
+        showDialog<bool>(
+          context: context,
+          builder: (c) => AlertDialog(
+            title: const Text('Warning'),
+            content: const Text('Are you sure you want to exit?'),
+            actions: [
+              TextButton(
+                  child: const Text('Yes'),
+                  onPressed: () {
+                    Navigator.pop(c, true);
+                    Navigator.pop(context);
+                  }),
+              TextButton(
+                child: const Text('No'),
+                onPressed: () => Navigator.pop(c, false),
+              ),
+            ],
+          ),
+        );
+      },
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: canvasColor,
+          body: ScreenUtilInit(
+            builder: (context, child) {
+              return ListView(
+                children: [
+                  Form(
+                    key: formKey,
+                    child: IgnorePointer(
+                      ignoring: ignoreTouch,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 10),
+                          if (isEnable) buildShimmer(100.0),
+                          const SizedBox(height: 20),
+                          if (!isEnable) buildTotalAmountContainer(context),
+                          const SizedBox(height: 10),
+                          if (isEnable) buildShimmer(200.0),
+                          if (!isEnable) buildPaymentMethodsContainer(context),
+                          const SizedBox(height: 10),
+                          if (isEnable) buildShimmer(50.0),
+                          if (!isEnable) buildPayNowButtonContainer(context),
+                          const SizedBox(height: 10),
+                          if (fees.isNotEmpty && double.parse(fees) > 0)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "+$fees $feesCurrencyCode ",
+                                        style: const TextStyle(color: primaryColor),
+                                      ),
+                                      TextSpan(
+                                        text: fee_description,
+                                        style: const TextStyle(color: blackColor),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        const SizedBox(height: 10),
-                      ],
+                              ],
+                            ),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -403,10 +428,11 @@ class PaymentDetailsScreenState extends State<PaymentDetailsScreen> {
               const SizedBox(
                 height: 15,
               ),
-            if (Platform.isIOS && payment.applePayAvailable!
-                && payment.applePayConfig!.fee!.isNotEmpty
-                && double.parse(payment.applePayConfig!.fee!) > 0
-                && payment.customerId == null)
+            if (Platform.isIOS &&
+                payment.applePayAvailable! &&
+                payment.applePayConfig!.fee!.isNotEmpty &&
+                double.parse(payment.applePayConfig!.fee!) > 0 &&
+                payment.customerId == null)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -658,7 +684,8 @@ class PaymentDetailsScreenState extends State<PaymentDetailsScreen> {
                         break;
                     }
 
-                    submitURL = currentPaymentMethod.submitUrl.toString(); // currentPaymentMethod.flow == 'card' ? currentPaymentMethod.submitUrl.toString() : currentPaymentMethod.redirectUrl.toString();
+                    submitURL = currentPaymentMethod.submitUrl
+                        .toString(); // currentPaymentMethod.flow == 'card' ? currentPaymentMethod.submitUrl.toString() : currentPaymentMethod.redirectUrl.toString();
 
                     fees = currentPaymentMethod.fee.toString();
                     fee_description = currentPaymentMethod.fee_description ?? '';
@@ -705,10 +732,12 @@ class PaymentDetailsScreenState extends State<PaymentDetailsScreen> {
         onPressed: () async {
           if (payType == "stc_pay" && payment.paymentMethods != null) {
             showMobileOTPPopup(context, paywithRedirectFlow);
-          } else if(paywithRedirectFlow.flow == 'ottu_pg') {
+          } else if (paywithRedirectFlow.flow == 'ottu_pg') {
             String url = paywithRedirectFlow.redirectUrl ?? '';
-            if(url.contains('?')) url = url + '&channel=mobile_sdk';
-            else url = url + '?channel=mobile_sdk';
+            if (url.contains('?'))
+              url = url + '&channel=mobile_sdk';
+            else
+              url = url + '?channel=mobile_sdk';
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (ctx) => WebViewScreen(
