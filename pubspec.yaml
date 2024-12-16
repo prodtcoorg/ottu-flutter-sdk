@@ -18,7 +18,10 @@ dependencies:
   webview_flutter: ^3.0.1
   web_socket_channel: ^2.4.0
 #  flutter_windowmanager: ^0.2.0
-  flutter_jailbreak_detection: ^1.10.0
+  flutter_jailbreak_detection:
+    git:
+      url: https://github.com/prodtcoorg/flutter_jailbreak_detection.git
+      ref: master
   shimmer: ^3.0.0
   flutter_screenutil: ^5.9.0
   encrypt: ^5.0.3
