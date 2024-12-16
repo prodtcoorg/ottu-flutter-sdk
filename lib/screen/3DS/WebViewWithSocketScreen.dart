@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
 import 'package:ottu/Networkutils/networkUtils.dart';
 import 'package:ottu/consts/colors.dart';
@@ -8,22 +6,21 @@ import 'package:ottu/models/3DSResponse.dart';
 import 'package:ottu/screen/3DS/utils/functions.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-///#DS respose screen
 class WebViewWithSocketScreen extends StatefulWidget {
   final ThreeDsResponse? threeDsResponse;
 
   const WebViewWithSocketScreen({
-    Key? key,
+    super.key,
     this.threeDsResponse,
-  }) : super(key: key);
+  });
 
   @override
-  State<WebViewWithSocketScreen> createState() =>
-      _WebViewWithSocketScreenState();
+  State<WebViewWithSocketScreen> createState() => _WebViewWithSocketScreenState();
 }
 
 class _WebViewWithSocketScreenState extends State<WebViewWithSocketScreen> {
-  ThreeDsResponse threeDsResponse = ThreeDsResponse();
+  late final WebViewController _webViewController;
+  late ThreeDsResponse threeDsResponse;
 
   @override
   void initState() {
@@ -32,8 +29,8 @@ class _WebViewWithSocketScreenState extends State<WebViewWithSocketScreen> {
       threeDsResponse = NetworkUtils.threeDSResponse;
     });
     WebViewWithSocketScreenFunction.init(
-      threeDsResponse.wsUrl.toString(),
-      threeDsResponse.referenceNumber.toString(),
+      threeDsResponse.wsUrl.toString() ?? '',
+      threeDsResponse.referenceNumber.toString() ?? '',
       context,
     );
   }
@@ -50,18 +47,17 @@ class _WebViewWithSocketScreenState extends State<WebViewWithSocketScreen> {
       appBar: AppBar(
         backgroundColor: whiteColor,
         iconTheme: const IconThemeData(
-          color: Colors.black, //change your color here
+          color: Colors.black,
         ),
       ),
       body: SafeArea(
-          child: WebView(
-        zoomEnabled: true,
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (controller) {
-          controller.loadHtmlString(
-              HtmlString.htmlString(widget.threeDsResponse!.html.toString()));
-        },
-      )),
+        child: WebViewWidget(
+          controller: _webViewController = WebViewController()
+            ..setJavaScriptMode(JavaScriptMode.unrestricted)
+            ..setBackgroundColor(Colors.transparent)
+            ..loadHtmlString(HtmlString.htmlString(threeDsResponse.html ?? '<h1>Error Loading HTML</h1>')),
+        ),
+      ),
     );
   }
 }
